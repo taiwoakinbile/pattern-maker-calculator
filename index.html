@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circle Skirt Drafting Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E4D8BC;
+    --paper-light:#F5EFDF;
+    --paper-deep:#D8C9A3;
+    --ink:#2A241C;
+    --ink-soft:#5B5142;
+    --chalk:#B93C52;
+    --chalk-soft:#B93C5222;
+    --blueprint:#2F5770;
+    --blueprint-soft:#2F577022;
+    --line:#C9B98C;
+    --radius-card:6px;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono:'Space Mono', 'Courier New', monospace;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(var(--line) 1px, transparent 1px) 0 0/28px 28px,
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:var(--blueprint);}
+
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 24px 80px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:64px 0 40px;
+    max-width:640px;
+  }
+  .hero h1{
+    font-family:var(--serif);
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(2.1rem, 4.4vw, 3.1rem);
+    line-height:1.08;
+    margin:0 0 18px;
+    letter-spacing:-0.01em;
+  }
+  .hero p{
+    font-size:1.08rem;
+    color:var(--ink-soft);
+    max-width:52ch;
+    margin:0;
+  }
+  .hero .tape{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+    padding-bottom:14px;
+    margin-bottom:22px;
+  }
+  .tape svg{flex:none;}
+
+  /* ---------- APP GRID ---------- */
+  .app{
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:820px){
+    .app{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--paper-light);
+    border:1px solid var(--paper-deep);
+    border-radius:var(--radius-card);
+    padding:26px;
+  }
+
+  /* Skirt type selector */
+  .type-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:24px;
+  }
+  .type-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 10px;
+    background:var(--paper);
+    border:1px solid var(--paper-deep);
+    border-radius:5px;
+    cursor:pointer;
+    font-family:var(--sans);
+    font-size:0.86rem;
+    color:var(--ink);
+    text-align:left;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .type-btn:hover{border-color:var(--blueprint);}
+  .type-btn:focus-visible{outline:2px solid var(--blueprint); outline-offset:2px;}
+  .type-btn[aria-pressed="true"]{
+    background:var(--paper-light);
+    border-color:var(--chalk);
+    box-shadow:inset 0 0 0 1px var(--chalk);
+  }
+  .type-btn svg{flex:none;}
+  .type-btn .t-label{font-weight:600;}
+  .type-btn .t-sub{display:block; font-family:var(--mono); font-size:0.7rem; color:var(--ink-soft); margin-top:1px;}
+
+  /* form fields */
+  .field{margin-bottom:18px;}
+  .field label{
+    display:block;
+    font-size:0.85rem;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .field .hint{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    margin-top:5px;
+  }
+  .num-row{display:flex; gap:8px;}
+  input[type="number"]{
+    flex:1;
+    min-width:0;
+    font-family:var(--mono);
+    font-size:1rem;
+    padding:10px 12px;
+    border:1px solid var(--paper-deep);
+    border-radius:5px;
+    background:#fff;
+    color:var(--ink);
+  }
+  input[type="number"]:focus-visible{outline:2px solid var(--blueprint); outline-offset:1px;}
+
+  .unit-toggle{
+    display:inline-flex;
+    border:1px solid var(--paper-deep);
+    border-radius:5px;
+    overflow:hidden;
+  }
+  .unit-toggle button{
+    font-family:var(--mono);
+    font-size:0.82rem;
+    padding:0 14px;
+    background:#fff;
+    border:none;
+    cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .unit-toggle button[aria-pressed="true"]{
+    background:var(--blueprint);
+    color:#fff;
+  }
+
+  details.adv{
+    border-top:1px solid var(--paper-deep);
+    padding-top:14px;
+    margin-top:6px;
+  }
+  details.adv summary{
+    cursor:pointer;
+    font-size:0.85rem;
+    font-weight:600;
+    color:var(--blueprint);
+    list-style:none;
+  }
+  details.adv summary::-webkit-details-marker{display:none;}
+  details.adv summary::before{
+    content:"+ ";
+  }
+  details.adv[open] summary::before{
+    content:"– ";
+  }
+  details.adv .field{margin-top:16px;}
+
+  .example-link{
+    background:none;
+    border:none;
+    font-family:var(--sans);
+    font-size:0.82rem;
+    color:var(--blueprint);
+    text-decoration:underline;
+    cursor:pointer;
+    padding:0;
+    margin-top:2px;
+  }
+
+  /* ---------- RESULTS / DIAGRAM ---------- */
+  .result-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:6px;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .result-top h2{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:1.4rem;
+    margin:0;
+  }
+  .result-top .type-pill{
+    font-family:var(--mono);
+    font-size:0.76rem;
+    color:var(--ink-soft);
+  }
+
+  .diagram-box{
+    background:var(--paper);
+    border:1px solid var(--paper-deep);
+    border-radius:5px;
+    padding:8px 8px 4px;
+    margin:14px 0 18px;
+  }
+  #diagram{width:100%; height:auto; display:block;}
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    font-size:0.76rem;
+    color:var(--ink-soft);
+    padding:10px 4px 4px;
+  }
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .legend i{width:14px; height:3px; display:inline-block; border-radius:2px;}
+  .legend i.dash{background:none; border-top:2px dashed var(--ink-soft); height:0;}
+
+  .numbers{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:14px;
+    margin:18px 0;
+  }
+  .num-card{
+    background:var(--paper);
+    border:1px solid var(--paper-deep);
+    border-left:3px solid var(--blueprint);
+    border-radius:4px;
+    padding:12px 14px;
+  }
+  .num-card.accent{border-left-color:var(--chalk);}
+  .num-card .k{
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .num-card .v{
+    font-family:var(--mono);
+    font-size:1.3rem;
+    font-weight:700;
+  }
+  .num-card .v small{font-size:0.7rem; font-weight:400; color:var(--ink-soft);}
+
+  .fabric-note{
+    background:var(--blueprint-soft);
+    border:1px solid var(--blueprint);
+    border-radius:5px;
+    padding:14px 16px;
+    font-size:0.86rem;
+    margin-top:6px;
+  }
+  .fabric-note strong{display:block; margin-bottom:4px; font-family:var(--serif); font-size:1rem;}
+
+  .pieces-row{
+    display:flex;
+    gap:16px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .piece-icon{
+    background:var(--paper);
+    border:1px solid var(--paper-deep);
+    border-radius:5px;
+    padding:10px;
+    text-align:center;
+    width:120px;
+  }
+  .piece-icon svg{display:block; margin:0 auto 6px;}
+  .piece-icon .label{font-size:0.74rem; color:var(--ink-soft);}
+
+  /* ---------- REFERENCE ---------- */
+  .reference{margin-top:46px;}
+  .reference h2{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:1.5rem;
+    margin:0 0 16px;
+  }
+  table.ref{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.88rem;
+    background:var(--paper-light);
+    border:1px solid var(--paper-deep);
+  }
+  table.ref th, table.ref td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--paper-deep);
+  }
+  table.ref th{
+    font-weight:600;
+    color:var(--ink-soft);
+    font-size:0.78rem;
+  }
+  table.ref td.formula{font-family:var(--mono);}
+  table.ref tr:last-child td{border-bottom:none;}
+  .reference .note{
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin-top:10px;
+    max-width:70ch;
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:22px;
+    border-top:1px solid var(--paper-deep);
+    font-size:0.8rem;
+    color:var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section class="hero">
+    <span class="tape" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="#5B5142" stroke-width="1.4"/><path d="M11 4v3M11 15v3M4 11h3M15 11h3" stroke="#5B5142" stroke-width="1.4"/></svg>
+      pattern-drafting calculator
+    </span>
+    <h1>Draft a circle skirt that actually fits.</h1>
+    <p>Enter a waist measurement and the length you want, from waist to hem. The calculator works out the radius for a full, three-quarter, half, or quarter circle — and draws the wedge you'll cut.</p>
+  </section>
+
+  <div class="app">
+
+    <!-- FORM PANEL -->
+    <div class="panel">
+
+      <div class="type-grid" role="group" aria-label="Skirt type">
+        <button class="type-btn" data-type="full" aria-pressed="true">
+          <svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="none" stroke="#B93C52" stroke-width="2"/></svg>
+          <span><span class="t-label">Full circle</span><span class="t-sub">360°</span></span>
+        </button>
+        <button class="type-btn" data-type="threeQuarter" aria-pressed="false">
+          <svg width="30" height="30" viewBox="0 0 30 30"><path d="M15 15 L15 2 A13 13 0 1 1 3.5 21.5 Z" fill="none" stroke="#B93C52" stroke-width="2"/></svg>
+          <span><span class="t-label">3/4 circle</span><span class="t-sub">270° · two pieces</span></span>
+        </button>
+        <button class="type-btn" data-type="half" aria-pressed="false">
+          <svg width="30" height="30" viewBox="0 0 30 30"><path d="M2 15 A13 13 0 0 1 28 15 Z" fill="none" stroke="#B93C52" stroke-width="2"/></svg>
+          <span><span class="t-label">Half circle</span><span class="t-sub">180°</span></span>
+        </button>
+        <button class="type-btn" data-type="quarter" aria-pressed="false">
+          <svg width="30" height="30" viewBox="0 0 30 30"><path d="M15 15 L15 2 A13 13 0 0 1 28 15 Z" fill="none" stroke="#B93C52" stroke-width="2"/></svg>
+          <span><span class="t-label">1/4 circle</span><span class="t-sub">90°</span></span>
+        </button>
+      </div>
+
+      <div class="field">
+        <label for="waist">Waist measurement</label>
+        <div class="num-row">
+          <input type="number" id="waist" min="0" step="0.1" value="28" inputmode="decimal">
+          <div class="unit-toggle" role="group" aria-label="Units">
+            <button type="button" data-unit="in" aria-pressed="true">in</button>
+            <button type="button" data-unit="cm" aria-pressed="false">cm</button>
+          </div>
+        </div>
+        <div class="hint">Measure snugly where the waistband will sit — not where you breathe in.</div>
+      </div>
+
+      <div class="field">
+        <label for="length">Skirt length (waist to hem)</label>
+        <input type="number" id="length" min="0" step="0.1" value="24" inputmode="decimal">
+        <div class="hint">Total finished length, before any hem allowance.</div>
+      </div>
+
+      <details class="adv">
+        <summary>Ease &amp; seam allowance</summary>
+        <div class="field">
+          <label for="ease">Waist ease</label>
+          <input type="number" id="ease" min="0" step="0.1" value="0" inputmode="decimal">
+          <div class="hint">Extra room added before the radius is calculated — useful for a fitted waistband with a zip. Leave at 0 for stretch or elastic waists.</div>
+        </div>
+        <div class="field">
+          <label for="waistSA">Waist seam allowance</label>
+          <input type="number" id="waistSA" min="0" step="0.1" value="0" inputmode="decimal">
+          <div class="hint">Cuts the waist hole this much <em>smaller</em> than the finished radius, so it opens up to size once the facing or waistband is attached.</div>
+        </div>
+        <div class="field">
+          <label for="hemSA">Hem allowance</label>
+          <input type="number" id="hemSA" min="0" step="0.1" value="0" inputmode="decimal">
+          <div class="hint">Extra fabric added <em>beyond</em> the hem radius, to be turned up and finished.</div>
+        </div>
+      </details>
+
+      <div>
+        <button type="button" class="example-link" id="loadExample">Load an example</button>
+      </div>
+    </div>
+
+    <!-- RESULTS PANEL -->
+    <div class="panel">
+      <div class="result-top">
+        <h2 id="typeHeading">Full circle skirt</h2>
+        <span class="type-pill" id="typeAngle">360° sweep</span>
+      </div>
+
+      <div class="numbers">
+        <div class="num-card accent">
+          <div class="k">Waist radius</div>
+          <div class="v" id="outWaistRadius">–</div>
+        </div>
+        <div class="num-card">
+          <div class="k">Outer (hem) radius</div>
+          <div class="v" id="outHemRadius">–</div>
+        </div>
+        <div class="num-card">
+          <div class="k">Pattern pieces</div>
+          <div class="v" id="outPieces">–</div>
+        </div>
+        <div class="num-card">
+          <div class="k">Seams to close waist</div>
+          <div class="v" id="outSeams">–</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <svg id="diagram" viewBox="0 0 480 420" role="img" aria-label="Pattern wedge diagram"></svg>
+        <div class="legend">
+          <span><i style="background:var(--chalk)"></i> waist line</span>
+          <span><i style="background:var(--blueprint)"></i> hem line</span>
+          <span><i class="dash"></i> fold edge</span>
+          <span><i style="background:var(--ink-soft)"></i> seam edge</span>
+        </div>
+      </div>
+
+      <div id="piecesRow" class="pieces-row" style="display:none;"></div>
+
+      <div class="fabric-note">
+        <strong>Estimated fabric needed</strong>
+        <div id="fabricText">Enter your measurements to see fabric requirements.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERENCE -->
+  <section class="reference">
+    <h2>Formula reference</h2>
+    <table class="ref">
+      <thead>
+        <tr><th>Skirt type</th><th>Waist radius</th><th>Outer (hem) radius</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Full circle</td><td class="formula">waist ÷ 6.28</td><td class="formula">waist radius + length</td></tr>
+        <tr><td>3/4 circle</td><td class="formula">(waist ÷ 6.28) × 1.33</td><td class="formula">waist radius + length</td></tr>
+        <tr><td>Half circle</td><td class="formula">waist ÷ 3.14</td><td class="formula">waist radius + length</td></tr>
+        <tr><td>1/4 circle</td><td class="formula">(waist ÷ 6.28) × 4</td><td class="formula">waist radius + length</td></tr>
+      </tbody>
+    </table>
+    <p class="note">These quick formulas round π to 3.14, which is fine for hand-drafting on paper. The calculator above uses full-precision π, so its numbers will be a hair more accurate — the difference is usually well under a millimetre.</p>
+  </section>
+
+  <footer>
+    Built for tailors, designers, and home sewists working at any skill level. Always true up your arcs and check against your own body or dress form before cutting fashion fabric.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const FRACTIONS = { full:1, threeQuarter:0.75, half:0.5, quarter:0.25 };
+
+  const TYPE_META = {
+    full: {
+      label:"Full circle skirt",
+      angle:"360° sweep",
+      foldEdges:[true,true],
+      pieces:1,
+      seams:"0–2",
+      seamsDetail:"0 seams if your fabric is wide enough for a double fold; 2 seams (center front &amp; back) if you piece it from two fabric widths.",
+      lengthMultiplier:2,
+      widthMultiplier:2
+    },
+    threeQuarter: {
+      label:"3/4 circle skirt",
+      angle:"270° sweep · 2 pieces",
+      foldEdges:[true,false],
+      pieces:2,
+      seams:"2",
+      seamsDetail:"2 seams, joining piece A to piece B on both sides.",
+      lengthMultiplier:2,
+      widthMultiplier:2
+    },
+    half: {
+      label:"Half circle skirt",
+      angle:"180° sweep",
+      foldEdges:[true,false],
+      pieces:1,
+      seams:"1",
+      seamsDetail:"1 seam, typically placed at center back.",
+      lengthMultiplier:1,
+      widthMultiplier:2
+    },
+    quarter: {
+      label:"1/4 circle skirt",
+      angle:"90° sweep",
+      foldEdges:[false,false],
+      pieces:1,
+      seams:"1",
+      seamsDetail:"1 seam, joining the piece's two straight edges.",
+      lengthMultiplier:1,
+      widthMultiplier:1
+    }
+  };
+
+  let currentType = "full";
+  let unit = "in";
+
+  const $ = (id) => document.getElementById(id);
+  const waistInput = $("waist"), lengthInput = $("length"), easeInput = $("ease"),
+        waistSAInput = $("waistSA"), hemSAInput = $("hemSA");
+
+  function num(el){ const v = parseFloat(el.value); return isNaN(v) || v < 0 ? 0 : v; }
+
+  function fmt(n){
+    if(!isFinite(n)) return "–";
+    return (Math.round(n*100)/100).toString();
+  }
+
+  function arcPointsPath(cx, cy, r, steps){
+    let pts = [];
+    for(let i=0;i<=steps;i++){
+      const t = (i/steps) * (Math.PI/2);
+      pts.push((cx + r*Math.cos(t)).toFixed(2) + "," + (cy - r*Math.sin(t)).toFixed(2));
+    }
+    return pts.join(" L ");
+  }
+  function arcPointsPathReverse(cx, cy, r, steps){
+    let pts = [];
+    for(let i=steps;i>=0;i--){
+      const t = (i/steps) * (Math.PI/2);
+      pts.push((cx + r*Math.cos(t)).toFixed(2) + "," + (cy - r*Math.sin(t)).toFixed(2));
+    }
+    return pts.join(" L ");
+  }
+
+  function edgeMarkup(x1,y1,x2,y2,isFold,labelPos){
+    const stroke = isFold ? "var(--ink-soft)" : "var(--ink)";
+    const dash = isFold ? 'stroke-dasharray="9,4,2,4"' : "";
+    const label = isFold ? "FOLD" : "SEAM";
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${stroke}" stroke-width="1.6" ${dash}/>
+      <text x="${labelPos.x}" y="${labelPos.y}" transform="rotate(${labelPos.rot} ${labelPos.x} ${labelPos.y})" class="mono-label" font-family="var(--mono)" font-size="10" fill="var(--ink-soft)">${label}</text>`;
+  }
+
+  function buildWedgeSVG(waistR, hemR, foldEdges, opts){
+    opts = opts || {};
+    const maxPixel = opts.maxPixel || 300;
+    const scale = hemR > 0 ? maxPixel / hemR : 1;
+    const cx = opts.cx !== undefined ? opts.cx : 95;
+    const cy = opts.cy !== undefined ? opts.cy : 370;
+    const wR = waistR * scale;
+    const hR = hemR * scale;
+    const steps = 28;
+
+    const hemPath = `M ${cx+wR},${cy} L ${cx+hR},${cy} L ${arcPointsPath(cx,cy,hR,steps)} L ${cx},${cy-wR} L ${arcPointsPathReverse(cx,cy,wR,steps)} Z`;
+    const holePath = `M ${cx},${cy} L ${cx+wR},${cy} L ${arcPointsPath(cx,cy,wR,steps)} L ${cx},${cy} Z`;
+    const waistArc = `M ${cx+wR},${cy} L ${arcPointsPath(cx,cy,wR,steps)}`;
+    const hemArc = `M ${cx+hR},${cy} L ${arcPointsPath(cx,cy,hR,steps)}`;
+
+    const midWR = { x: cx + wR*Math.cos(Math.PI/4), y: cy - wR*Math.sin(Math.PI/4) };
+    const midHR = { x: cx + hR*Math.cos(Math.PI/4), y: cy - hR*Math.sin(Math.PI/4) };
+
+    const edge1 = edgeMarkup(cx+wR, cy, cx+hR, cy, foldEdges[0], {x:(cx+wR+cx+hR)/2, y:cy+16, rot:0});
+    const edge2 = edgeMarkup(cx, cy-wR, cx, cy-hR, foldEdges[1], {x:cx-22, y:(cy-wR+cy-hR)/2, rot:-90});
+
+    let svg = "";
+    svg += `<path d="${holePath}" fill="var(--paper-deep)" fill-opacity="0.55"/>`;
+    svg += `<path d="${hemPath}" fill="var(--paper-light)" stroke="none"/>`;
+    svg += edge1;
+    svg += edge2;
+    svg += `<path d="${waistArc}" fill="none" stroke="var(--chalk)" stroke-width="2.4"/>`;
+    svg += `<path d="${hemArc}" fill="none" stroke="var(--blueprint)" stroke-width="2.4"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="2.6" fill="var(--ink)"/>`;
+
+    if(opts.labels !== false){
+      // grainline arrow along the bisector
+      const gA = { x: cx + (wR+6)*Math.cos(Math.PI/4), y: cy - (wR+6)*Math.sin(Math.PI/4) };
+      const gB = { x: cx + (hR-6)*Math.cos(Math.PI/4), y: cy - (hR-6)*Math.sin(Math.PI/4) };
+      svg += `<line x1="${gA.x}" y1="${gA.y}" x2="${gB.x}" y2="${gB.y}" stroke="var(--ink)" stroke-width="1" marker-start="url(#arrowStart)" marker-end="url(#arrowEnd)"/>`;
+      svg += `<text x="${(gA.x+gB.x)/2 + 8}" y="${(gA.y+gB.y)/2}" font-family="var(--sans)" font-size="10" fill="var(--ink-soft)" transform="rotate(-45 ${(gA.x+gB.x)/2 + 8} ${(gA.y+gB.y)/2})">grainline</text>`;
+
+      svg += `<text x="${midWR.x+6}" y="${midWR.y-6}" font-family="var(--mono)" font-size="11" fill="var(--chalk)">waist r ${fmt(waistR)}</text>`;
+      svg += `<text x="${midHR.x+6}" y="${midHR.y-6}" font-family="var(--mono)" font-size="11" fill="var(--blueprint)">hem r ${fmt(hemR)}</text>`;
+    }
+
+    return svg;
+  }
+
+  function buildPieceIcon(waistR, hemR, foldEdges, label){
+    const inner = buildWedgeSVG(waistR, hemR, foldEdges, {maxPixel:60, cx:20, cy:78, labels:false});
+    return `<div class="piece-icon">
+      <svg width="100" height="90" viewBox="0 0 100 90">${inner}</svg>
+      <div class="label">${label}</div>
+    </div>`;
+  }
+
+  function unitLabel(){ return unit; }
+
+  function toDisplayLength(n){
+    // fabricLength is in the same unit as input; convert to yards / meters for buying
+    if(unit === "in") return (n/36).toFixed(2) + " yd";
+    return (n/100).toFixed(2) + " m";
+  }
+
+  function render(){
+    const waist = num(waistInput);
+    const length = num(lengthInput);
+    const ease = num(easeInput);
+    const waistSA = num(waistSAInput);
+    const hemSA = num(hemSAInput);
+    const meta = TYPE_META[currentType];
+    const f = FRACTIONS[currentType];
+
+    $("typeHeading").textContent = meta.label;
+    $("typeAngle").textContent = meta.angle;
+
+    if(waist <= 0 || length <= 0){
+      $("outWaistRadius").innerHTML = "–";
+      $("outHemRadius").innerHTML = "–";
+      $("outPieces").textContent = meta.pieces;
+      $("outSeams").textContent = meta.seams;
+      $("fabricText").textContent = "Enter your waist and length above to see fabric requirements.";
+      $("diagram").innerHTML = "";
+      $("piecesRow").style.display = "none";
+      return;
+    }
+
+    const effectiveWaist = waist + ease;
+    const waistRadius = effectiveWaist / (2*Math.PI*f);
+    const hemRadius = waistRadius + length;
+
+    const waistCutRadius = Math.max(waistRadius - waistSA, 0);
+    const hemCutRadius = hemRadius + hemSA;
+
+    $("outWaistRadius").innerHTML = fmt(waistRadius) + " <small>" + unitLabel() + "</small>";
+    $("outHemRadius").innerHTML = fmt(hemRadius) + " <small>" + unitLabel() + "</small>";
+    $("outPieces").textContent = meta.pieces;
+    $("outSeams").textContent = meta.seams;
+
+    // diagram (uses cutting radii so seam/ease adjustments are visible)
+    document.getElementById("diagram").innerHTML = buildWedgeSVG(waistCutRadius, hemCutRadius, meta.foldEdges);
+
+    // fabric estimate
+    const fabricLength = meta.lengthMultiplier * hemCutRadius;
+    const minWidth = meta.widthMultiplier * hemCutRadius;
+    $("fabricText").innerHTML =
+      `About <strong>${toDisplayLength(fabricLength)}</strong> of fabric, at least <strong>${fmt(minWidth)} ${unitLabel()}</strong> wide. ${meta.seamsDetail} This is an estimate for standard folding methods — buy a little extra for security, especially with a nap, plaid, or one-way print.`;
+
+    // piece icons for 3/4 circle
+    const piecesRow = $("piecesRow");
+    if(currentType === "threeQuarter"){
+      piecesRow.style.display = "flex";
+      piecesRow.innerHTML =
+        buildPieceIcon(waistCutRadius, hemCutRadius, [true,false], "Piece A — on the fold") +
+        buildPieceIcon(waistCutRadius, hemCutRadius, [false,false], "Piece B — single layer");
+    } else {
+      piecesRow.style.display = "none";
+      piecesRow.innerHTML = "";
+    }
+  }
+
+  // type buttons
+  document.querySelectorAll(".type-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll(".type-btn").forEach(b=>b.setAttribute("aria-pressed", b===btn ? "true":"false"));
+      currentType = btn.dataset.type;
+      render();
+    });
+  });
+
+  // unit toggle
+  document.querySelectorAll(".unit-toggle button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll(".unit-toggle button").forEach(b=>b.setAttribute("aria-pressed", b===btn ? "true":"false"));
+      unit = btn.dataset.unit;
+      render();
+    });
+  });
+
+  [waistInput, lengthInput, easeInput, waistSAInput, hemSAInput].forEach(el=>{
+    el.addEventListener("input", render);
+  });
+
+  $("loadExample").addEventListener("click", ()=>{
+    waistInput.value = 28;
+    lengthInput.value = 24;
+    easeInput.value = 0.5;
+    waistSAInput.value = 0.5;
+    hemSAInput.value = 1;
+    document.querySelectorAll(".type-btn").forEach(b=>b.setAttribute("aria-pressed", b.dataset.type==="full" ? "true":"false"));
+    currentType = "full";
+    render();
+  });
+
+  // svg defs for arrowheads (added once)
+  const defs = document.createElementNS("http://www.w3.org/2000/svg","defs");
+  defs.innerHTML = `
+    <marker id="arrowStart" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto"><path d="M7,1 L1,4 L7,7" fill="none" stroke="black" stroke-width="1.2"/></marker>
+    <marker id="arrowEnd" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7" fill="none" stroke="black" stroke-width="1.2"/></marker>
+  `;
+  document.getElementById("diagram").appendChild(defs);
+
+  render();
+})();
+</script>
+</body>
+</html>
